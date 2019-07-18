@@ -3,8 +3,9 @@ import copy
 import pickle
 from torch.utils.data import Dataset
 from torch.autograd import Variable
-from tqdm import tqdm
 import numpy as np
+
+from paths import TEST_TRIPLES_PATH, VAL_TRIPLES_PATH, TRAIN_TRIPLES_PATH
 
 use_cuda = torch.cuda.is_available()
 
@@ -100,11 +101,11 @@ class DialogTurn:
 class MovieTriples(Dataset):
     def __init__(self, data_type, length=None):
         if data_type == 'train':
-            _file = '/home/harshals/hed-dlg/Data/MovieTriples/Training.triples.pkl'
+            _file = TRAIN_TRIPLES_PATH
         elif data_type == 'valid':
-            _file = '/home/harshals/hed-dlg/Data/MovieTriples/Validation.triples.pkl'
+            _file = VAL_TRIPLES_PATH
         elif data_type == 'test':
-            _file = '/home/harshals/hed-dlg/Data/MovieTriples/Test.triples.pkl'
+            _file = TEST_TRIPLES_PATH
         self.utterance_data = []
 
         with open(_file, 'rb') as fp:

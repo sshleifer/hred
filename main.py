@@ -6,6 +6,7 @@ import torch.optim as optim
 from torch.utils.data import DataLoader
 
 from modules import *
+from paths import training_dict_path, eval_source_path
 from util import *
 from collections import Counter
 
@@ -256,8 +257,8 @@ def calc_valid_loss(data_loader, criteria, model):
 
 def data_to_seq():
     # we use a common dict for all test, train and validation
-    _dict_file = '/home/harshals/hed-dlg/Data/MovieTriples/Training.dict.pkl'
-    with open(_dict_file, 'rb') as fp2:
+
+    with open(training_dict_path, 'rb') as fp2:
         dict_data = pickle.load(fp2)
     # dictionary data is like ('</s>', 2, 588827, 785135)
     # so i believe that the first is the ids are assigned by frequency
@@ -267,8 +268,8 @@ def data_to_seq():
         tok, f, _, _ = x
         inv_dict[f] = tok
         vocab_dict[tok] = f
-    _file = '/data2/chatbot_eval_issues/results/AMT_NCM_Test_NCM_Joao/neural_conv_model_eval_source.txt'
-    with open(_file, 'r') as fp:
+
+    with open(eval_source_path, 'r') as fp:
         all_seqs = []
         for lin in fp.readlines():
             seq = list()
