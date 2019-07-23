@@ -56,7 +56,7 @@ def train(options, model):
     print("Training set {} Validation set {}".format(len(train_dataset), len(valid_dataset)))
 
     
-    criteria = nn.CrossEntropyLoss(ignore_index=10003, size_average=False)
+    criteria = nn.CrossEntropyLoss(ignore_index=PAD_IDX, size_average=False)
     if use_cuda: criteria.cuda()
     
     best_vl_loss, patience, batch_id = 10000, 0, 0
@@ -79,7 +79,7 @@ def train(options, model):
             u3 = u3[:, 1:].contiguous().view(-1)
             
             loss = criteria(preds, u3)
-            target_toks = u3.ne(10003).long().sum().data[0]
+            target_toks = u3.ne(PAD_IDX).long().sum().data[0]
             
             num_words += target_toks
             tr_loss += loss.data[0]
@@ -181,12 +181,12 @@ def get_sent_ll(u3, u3_lens, model, criteria, ses_encoding):
     preds = preds[:, :-1, :].contiguous().view(-1, preds.size(2))
     u3 = u3[:, 1:].contiguous().view(-1)
     loss = criteria(preds, u3).data[0]
-    target_toks = u3.ne(10003).long().sum().data[0]
+    target_toks = u3.ne(PAD_IDX).long().sum().data[0]
     return -1*loss/target_toks
     
 # sample a sentence from the test set by using beam search
 def inference_beam(dataloader, model, inv_dict, options):
-    criteria = nn.CrossEntropyLoss(ignore_index=10003, size_average=False)
+    criteria = nn.CrossEntropyLoss(ignore_index=PAD_IDX, size_average=False)
     if use_cuda:
         criteria.cuda()
     
@@ -246,7 +246,7 @@ def calc_valid_loss(data_loader, criteria, model):
         u3 = u3[:, 1:].contiguous().view(-1)
         # do not include the lM loss, exp(loss) is perplexity
         loss = criteria(preds, u3)
-        num_words += u3.ne(10003).long().sum().data[0]
+        num_words += u3.ne(PAD_IDX).long().sum().data[0]
         valid_loss += loss.data[0]
 
     model.train()

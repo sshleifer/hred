@@ -6,7 +6,7 @@ from torch.autograd import Variable
 import numpy as np
 
 from paths import TEST_TRIPLES_PATH, VAL_TRIPLES_PATH, TRAIN_TRIPLES_PATH
-
+PAD_IDX = 0
 use_cuda = torch.cuda.is_available()
 
 
@@ -14,7 +14,7 @@ def custom_collate_fn(batch):
     # input is a list of dialogturn objects
     bt_siz = len(batch)
     # sequence length only affects the memory requirement, otherwise longer is better
-    pad_idx, max_seq_len = 10003, 160
+    pad_idx, max_seq_len = PAD_IDX, 160
 
     u1_batch, u2_batch, u3_batch = [], [], []
     u1_lens, u2_lens, u3_lens = np.zeros(bt_siz, dtype=int), np.zeros(bt_siz, dtype=int), np.zeros(bt_siz, dtype=int)
@@ -133,7 +133,7 @@ class MovieTriples(Dataset):
 
 def tensor_to_sent(x, inv_dict, greedy=False):
     sents = []
-    inv_dict[10003] = '<pad>'
+    inv_dict[PAD_IDX] = '<pad>'
     for li in x:
         if not greedy:
             scr = li[1]

@@ -2,6 +2,7 @@ import torch.nn as nn, torch, copy, tqdm, math
 from torch.autograd import Variable
 import torch.nn.functional as F
 use_cuda = torch.cuda.is_available()
+from util import PAD_IDX
 
 
 def max_out(x):
@@ -52,7 +53,7 @@ class BaseEncoder(nn.Module):
         self.drop = nn.Dropout(options.drp)
         self.direction = 2 if options.bidi else 1
         # by default they requires grad is true
-        self.embed = nn.Embedding(vocab_size, emb_size, padding_idx=10003, sparse=False)
+        self.embed = nn.Embedding(vocab_size, emb_size, padding_idx=PAD_IDX, sparse=False)
         self.rnn = nn.GRU(input_size=emb_size, hidden_size=hid_size,
                           num_layers=self.num_lyr, bidirectional=options.bidi, batch_first=True, dropout=options.drp)
 
@@ -115,7 +116,7 @@ class Decoder(nn.Module):
         self.tanh = nn.Tanh()
         self.shared_weight = options.shrd_dec_emb
         
-        self.embed_in = nn.Embedding(options.vocab_size, self.emb_size, padding_idx=10003, sparse=False)
+        self.embed_in = nn.Embedding(options.vocab_size, self.emb_size, padding_idx=PAD_IDX, sparse=False)
         if not self.shared_weight:
             self.embed_out = nn.Linear(self.emb_size, options.vocab_size, bias=False)
         
