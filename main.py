@@ -6,9 +6,10 @@ import torch.optim as optim
 from torch.utils.data import DataLoader
 
 from modules import *
-from paths import training_dict_path, eval_source_path
+from paths import training_dict_path, eval_source_path, dict_file
 from util import *
 from collections import Counter
+from durbango import pickle_save, pickle_load
 
 use_cuda = torch.cuda.is_available()
 torch.manual_seed(123)
@@ -56,8 +57,7 @@ def train(options, model):
 
     
     criteria = nn.CrossEntropyLoss(ignore_index=10003, size_average=False)
-    if use_cuda:
-        criteria.cuda()
+    if use_cuda: criteria.cuda()
     
     best_vl_loss, patience, batch_id = 10000, 0, 0
     for i in range(options.epoch):
@@ -301,18 +301,10 @@ def uniq_answer(fil):
     
 def main():
     print('torch version {}'.format(torch.__version__))
-    _dict_file = '/home/harshals/hed-dlg/Data/MovieTriples/Training.dict.pkl'
+
     # we use a common dict for all test, train and validation
     
-    with open(_dict_file, 'rb') as fp2:
-        dict_data = pickle.load(fp2)
-    # dictionary data is like ('</s>', 2, 588827, 785135)
-    # so i believe that the first is the ids are assigned by frequency
-    # thinking to use a counter collection out here maybe
-    inv_dict = {}
-    for x in dict_data:
-        tok, f, _, _ = x
-        inv_dict[f] = tok
+
 
     parser = argparse.ArgumentParser(description='HRED parameter options')
     parser.add_argument('-n', dest='name', help='enter suffix for model files', required=True)
@@ -340,6 +332,17 @@ def main():
     
     options = parser.parse_args()
     print(options)
+    pickle_save(options, 'options.pkl')
+
+    with open(dict_file, 'rb') as fp2:
+        dict_data = pickle.load(fp2)
+    # dictionary data is like ('</s>', 2, 588827, 785135)
+    # so i believe that the first is the ids are assigned by frequency
+    # thinking to use a counter collection out here maybe
+    itos = {}
+    for x in dict_data:
+        tok, f, _, _ = x
+        itos[f] = tok
 
     model = Seq2Seq(options)
     if use_cuda:

@@ -73,6 +73,7 @@ def custom_collate_fn(batch):
     return u1_batch[sort1, :], u1_lens[sort1], u2_batch[sort2, :], u2_lens[sort2], u3_batch[sort3, :], u3_lens[sort3]
 
 
+
 class DialogTurn:
     def __init__(self, item):
         self.u1, self.u2, self.u3 = [], [], []
@@ -97,6 +98,9 @@ class DialogTurn:
     def __repr__(self):
         return str(self.u1 + self.u2 + self.u3)
 
+class Example(DialogTurn):
+
+    def __init__(self, u1, u2, u3): self.u1, self.u2, self.u3 = u1,u2,u3
 
 class MovieTriples(Dataset):
     def __init__(self, data_type, length=None):
@@ -123,6 +127,8 @@ class MovieTriples(Dataset):
     def __getitem__(self, idx):
         dialog = self.utterance_data[idx]
         return dialog, len(dialog.u1), len(dialog.u2), len(dialog.u3)
+
+
 
 
 def tensor_to_sent(x, inv_dict, greedy=False):
